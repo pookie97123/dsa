@@ -1,0 +1,764 @@
+//HEAD
+
+if [ $# -lt 1 ] || [ $# -gt 2 ]
+then 
+	echo "Enter correct input"
+fi
+
+if [ $# -eq 1 ]
+then
+	cnt=10
+	filename=$1
+else
+	cnt=$1
+	filename=$2
+fi
+
+exec < $filename
+i=1
+while [ $i -le $cnt ]
+do
+	read line
+	echo $line
+	i=$(( i+1 ))
+done
+
+
+
+// TAIL 
+
+if [ $# -lt 1 ] || [ $# -gt 2 ]
+then
+        echo "Enter valid input"
+fi
+
+if [ $# -eq 1 ]
+then
+        cnt=10
+        filename=$1
+else
+        cnt=$1
+        filename=$2
+fi
+
+exec < $filename
+i=1
+
+k=$(wc -l < "$filename")
+c1=`expr $k - $cnt`
+
+while [ $i -le $k ]
+do
+        read line
+        if [ $i -gt $c1 ]
+        then
+        echo $line
+        fi
+        i=`expr $i + 1`
+done
+
+
+
+// DIRECTORY
+
+choice=0
+
+while [ $choice -ne 6 ]
+do
+    echo " "
+    echo "DIRECTORY MANAGEMENT SYSTEM"
+    echo " "
+    echo "1. Create directory"
+    echo "2. Modify directory"
+    echo "3. Change permission"
+    echo "4. Present directory contents"
+    echo "5. Navigate to a different directory"
+    echo "6. Exit"
+    read choice
+
+    case $choice in
+        1)
+            echo "Enter the name of the directory"
+            read name
+            mkdir $name
+            ;;
+        2)
+            choice2=0
+            while [ $choice2 -ne 7 ]; do
+                echo " "
+                echo "Modify directory"
+                echo " "
+                echo "1. Create file"
+                echo "2. Rename directory"
+                echo "3. Copy directory"
+                echo "4. Move directory"
+                echo "5. Delete directory"
+                echo "6. Modify file permissions"
+                echo "7. Exit"
+                read choice2
+                case $choice2 in
+                    1)
+                        echo "Enter the name of the file"
+                        read filename
+
+                        # Validate if the filename contains invalid characters
+                        if [[ "$filename" =~ [/\:\*\?\"\<\>\|] ]]; then
+                            echo "Error: Invalid file name. File names cannot contain: / \\ : * ? \" < > |"
+                        else
+                            touch "$filename" && echo "File '$filename' created successfully."
+                        fi
+                        ;;
+                    2)
+                        echo "Enter the name of the directory"
+                        read dirname
+                        echo "Enter the new name of the directory"
+                        read nname
+                        mv $dirname $nname
+                        find $nname
+                        ;;
+                    3)
+                        echo "Enter the name of the directory"
+                        read dirname
+                        echo "Enter the new name of the copied directory"
+                        read nname
+                        cp -R $dirname $nname
+                        ;;
+                    4)
+                        echo "Enter the name of the directory"
+                        read dirname
+                        echo "Enter the destination path"
+                        read destpath
+                        mv $dirname $destpath
+                        ;;
+                    5)
+                        echo "Enter the name of the directory"
+                        read dirname
+                        rm -r $dirname
+                        ;;
+                    6)
+                        echo "Enter the name of the file to modify permissions"
+                        read filename
+                        if [ ! -f "$filename" ]; then
+                            echo "Error: File '$filename' does not exist."
+                        else
+                            echo "Enter permission to modify (e.g., 755):"
+                            read perm
+                            chmod $perm $filename && echo "Permissions updated for file '$filename'."
+                        fi
+                        ;;
+                    7)
+                        echo "Exiting"
+                        choice2=7
+                        ;;
+                esac
+            done
+            ;;
+        3)
+            choice2=0
+            while [ $choice2 -ne 3 ]; do
+                echo "Permission modes"
+                echo "1. Add"
+                echo "2. Revoke"
+                echo "3. Exit"
+                echo "Enter your choice:"
+                read choice2
+
+                if [ $choice2 -eq 3 ]; then
+                    echo "Exiting"
+                    choice2=3
+                    break
+                fi
+
+                echo "Enter the name of the file"
+                read filename
+
+                echo "For who"
+                echo "1. User"
+                echo "2. Group"
+                echo "3. Other"
+                read who
+
+                echo "Select permission"
+                echo "0. No permission"
+                echo "1. Execute permission"
+                echo "2. Write permission"
+                echo "3. Write and execution permission"
+                echo "4. Read permission"
+                echo "5. Read and execution permission"
+                echo "6. Read and write permission"
+                echo "7. Read, write, and execution permission"
+                read choice3
+
+                user=""
+                if [ $who -eq 1 ]; then
+                    user="u"
+                elif [ $who -eq 2 ]; then
+                    user="g"
+                elif [ $who -eq 3 ]; then
+                    user="o"
+                fi
+
+                sign=""
+                if [ $choice2 -eq 1 ]; then
+                    sign="+"
+                elif [ $choice2 -eq 2 ]; then
+                    sign="-"
+                fi
+
+                permission=""
+                if [ $choice3 -eq 1 ]; then
+                    permission="x"
+                elif [ $choice3 -eq 2 ]; then
+                    permission="w"
+                elif [ $choice3 -eq 3 ]; then
+                    permission="wx"
+                elif [ $choice3 -eq 4 ]; then
+                    permission="r"
+                elif [ $choice3 -eq 5 ]; then
+                    permission="rx"
+                elif [ $choice3 -eq 6 ]; then
+                    permission="rw"
+                elif [ $choice3 -eq 7 ]; then
+                    permission="rwx"
+                fi
+
+                chmod $user$sign$permission $filename
+            done
+            ;;
+        4)
+            echo "Presenting directory contents"
+            ls -l
+            ;;
+        5)
+            echo "Enter the path to navigate to:"
+            read dirpath
+            if cd "$dirpath" 2>/dev/null; then
+                echo "Successfully navigated to $(pwd)"
+            else
+                echo "Failed to navigate. Directory does not exist."
+            fi
+            ;;
+        6)
+            echo "Exiting"
+            choice=6
+            ;;
+    esac
+done
+
+
+// DBMS 
+
+#!/bin/bash
+
+choice=0
+FILE_PATH="/home/niraj/OS/practicals/data.txt"
+
+while [ $choice -ne 7 ]; do
+    echo " "
+    echo "----- Welcome to Linux Database Management System $(date) ------"
+    echo " "
+    echo "1. Insert Data"
+    echo "2. View all Data"
+    echo "3. Search Data"
+    echo "4. Sort Data"
+    echo "5. Modify Specific Data"
+    echo "6. Delete Specific Data"
+    echo "7. Exit"
+    echo -n "Enter your choice: "
+    read choice
+    case $choice in
+        1)
+            echo "--- Insert Mode ---"
+            lastLine=""
+            while read -r line; do
+                lastLine="$line"
+            done <"$FILE_PATH"
+            lastId=$(echo "$lastLine" | cut -d ',' -f 1)
+            id=$((lastId + 1))
+            echo -n "Enter Employee Name: "
+            read name
+            echo -n "Enter Employee City: "
+            read city
+            echo -n "Enter Employee Position: "
+            read position
+            echo -n "Enter Employee Salary: "
+            read salary
+            echo "$id,$name,$city,$position,$salary" >>"$FILE_PATH"
+            ;;
+        2)
+            echo "--- View Mode ---"
+            cat "$FILE_PATH"
+            ;;
+        3)
+            choice2=0
+            while [ $choice2 -ne 6 ]; do
+                echo "--- Search Mode ---"
+                echo "1. Search by ID"
+                echo "2. Search by Name"
+                echo "3. Search by City"
+                echo "4. Search by Position"
+                echo "5. Search by Salary"
+                echo "6. Exit"
+                echo -n "Enter your choice: "
+                read choice2
+                case $choice2 in
+                    1)
+                        echo -n "Enter the ID to search: "
+                        read id
+                        echo "<-- Result -->"
+                        grep -w "^$id" "$FILE_PATH"
+                        ;;
+                    2)
+                        echo -n "Enter the name of the candidate: "
+                        read name
+                        echo "<-- Result -->"
+                        grep -w "$name" "$FILE_PATH"
+                        ;;
+                    3)
+                        echo -n "Enter the city: "
+                        read city
+                        echo "<-- Result -->"
+                        grep -w "$city" "$FILE_PATH"
+                        ;;
+                    4)
+                        echo -n "Enter position: "
+                        read position
+                        echo "<-- Result -->"
+                        grep -w "$position" "$FILE_PATH"
+                        ;;
+                    5)
+                        echo -n "Enter Salary: "
+                        read salary
+                        echo "<-- Result -->"
+                        grep -w "$salary" "$FILE_PATH"
+                        ;;
+                    6)
+                        echo "Exiting..."
+                        ;;
+                esac
+            done
+            ;;
+        4)
+            choice2=0
+            while [ $choice2 -ne 3 ]; do
+                echo "--- Sort Mode ---"
+                echo "1. Sort by ID"
+                echo "2. Sort by City"
+                echo "3. Exit"
+                echo -n "Enter your choice: "
+                read choice2
+                case $choice2 in
+                    1)
+                        sort -t, -k1,1 -n "$FILE_PATH"
+                        ;;
+                    2)
+                        sort -t, -k3,3 "$FILE_PATH"
+                        ;;
+                    3)
+                        echo "Exiting..."
+                        ;;
+                esac
+            done
+            ;;
+        5)
+            echo "--- Modify Mode ---"
+            echo -n "Enter the ID to modify: "
+            read id
+            echo -n "Enter the new name: "
+            read name
+            echo -n "Enter the new city: "
+            read city
+            echo -n "Enter the new position: "
+            read position
+            echo -n "Enter the new salary: "
+            read salary
+            sed -i "s/^$id,.*/$id,$name,$city,$position,$salary/" "$FILE_PATH"
+            echo "Modified Successfully"
+            ;;
+        6)
+            echo "--- Delete Mode ---"
+            echo -n "Enter the ID to delete: "
+            read id
+            sed -i "/^$id,.*/d" "$FILE_PATH"
+            echo "Deleted Successfully"
+            ;;
+        7)
+            echo "Exiting..."
+            choice=7
+            ;;
+        *)
+            echo "Invalid choice, please try again."
+            ;;
+    esac
+done
+
+
+
+
+// BANKERS
+
+#include <stdio.h>
+
+int main()
+{
+    int process, resource, i, j, instance, k = 0, count = 0, temp = 0;
+    printf("\n Enter No. of Process : ");
+    scanf("%d", &process); // row
+    printf(" Enter No. of Resources : ");
+    scanf("%d", &resource); // column
+    int available[resource], max[process][resource], allocated[process][resource], need[process][resource], completed[process];
+
+    for (i = 0; i < process; i++)
+        completed[i] = 0;
+
+    printf("\n Enter No. of AVAILABLE Instances for each resource\n\n");
+    for (i = 0; i < resource; i++)
+    {
+        printf(" Resources[%d] : ", i);
+        scanf("%d", &instance);
+        available[i] = instance;
+    }
+
+    printf("\n------------------------------------------------------------------------------\n");
+    printf("\n Enter MAXIMUM instance for a Process & its corresponding resource :\n");
+    for (i = 0; i < process; i++)
+    {
+        printf("\n For Process[%d] \n", i);
+        for (j = 0; j < resource; j++)
+        {
+            printf(" Resource[%d] : ", j);
+            scanf("%d", &instance);
+            max[i][j] = instance;
+        }
+    }
+
+    printf("\n------------------------------------------------------------------------------\n");
+    printf("\n Enter instance ALLOCATED for a Process & its corresponding resource :\n");
+    for (i = 0; i < process; i++)
+    {
+        printf("\n For Process[%d] \n", i);
+        for (j = 0; j < resource; j++)
+        {
+            printf(" Resource[%d] : ", i);
+            scanf("%d", &instance);
+            allocated[i][j] = instance;
+            need[i][j] = max[i][j] - allocated[i][j];
+        }
+    }
+
+    printf("\n------------------------------------------------------------------------------\n");
+    printf("\nSafe Sequence is : ");
+
+    int ctn = 0;
+    while (count != process)
+    {
+        count = temp;
+        for (i = 0; i < process; i++)
+        {
+            for (j = 0; j < resource; j++)
+            {
+                if (need[i][j] <= available[j])
+                {
+                    k++;
+                }
+            }
+            if (k == resource && completed[i] == 0)
+            {
+                printf(" > P[%d] ", (i + 1));
+                completed[i] = 1;
+                for (j = 0; j < resource; j++)
+                {
+                    available[j] = available[j] + allocated[i][j];
+                }
+                count++;
+            }
+            k = 0;
+        }
+
+        if (count == temp)
+        {
+            break;
+        }
+    }
+
+    for (i = 0; i < process; i++)
+    {
+        if (completed[i] != 1)
+        {
+            printf("\n\n P[%d] not able to allocate", (i + 1));
+        }
+    }
+    printf("\n");
+    }
+    
+    
+// CONSUMER PRODUCER
+
+#include <stdio.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+
+#define BUFFER_SIZE 5
+#define PRODUCER_SLEEP_TIME 1
+#define CONSUMER_SLEEP_TIME 1
+
+sem_t empty;
+sem_t full;
+sem_t mutex;
+
+int buffer[BUFFER_SIZE];
+int in = 0, out = 0;
+
+void *producer(void *arg)
+{
+    int item = 0;
+    while (1)
+    {
+        // Produce an item
+        item++;
+        printf("Produced: %d\n", item);
+
+        sem_wait(&empty);
+        sem_wait(&mutex);
+
+        buffer[in] = item;
+        in = (in + 1) % BUFFER_SIZE;
+
+        sem_post(&mutex);
+        sem_post(&full);
+
+        sleep(PRODUCER_SLEEP_TIME);
+    }
+}
+
+void *consumer(void *arg)
+{
+    int item;
+    while (1)
+    {
+        sem_wait(&full);
+        sem_wait(&mutex);
+
+        item = buffer[out];
+        out = (out + 1) % BUFFER_SIZE;
+
+        sem_post(&mutex);
+        sem_post(&empty);
+
+        // Consume the item
+        printf("Consumed: %d\n", item);
+        sleep(CONSUMER_SLEEP_TIME);
+    }
+}
+
+int main()
+{
+    pthread_t prod, cons;
+
+    // Initialize semaphores
+    sem_init(&empty, 0, BUFFER_SIZE);
+    sem_init(&full, 0, 0);
+    sem_init(&mutex, 0, 1);
+
+    // Create producer and consumer threads
+    pthread_create(&prod, NULL, producer, NULL);
+    pthread_create(&cons, NULL, consumer, NULL);
+
+    // Join threads
+    pthread_join(prod, NULL);
+    pthread_join(cons, NULL);
+
+    // Destroy semaphores
+    sem_destroy(&empty);
+    sem_destroy(&full);
+    sem_destroy(&mutex);
+
+    return 0;
+}
+
+
+// DINNING
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+
+#define NUM_PHILOSOPHERS 5
+#define NUM_MEALS 3
+
+sem_t forks[NUM_PHILOSOPHERS];
+sem_t max_philosopher;
+
+void *philosopher(void *arg)
+{
+    int id = *(int *)arg;
+    int left_fork = id;
+    int right_fork = (id + 1) % NUM_PHILOSOPHERS;
+
+    for (int i = 0; i < NUM_MEALS; i++)
+    {
+        // Think
+        printf("Philosopher %d is thinking.\n", id);
+        sleep(rand() % 3 + 1);
+
+        // Get forks
+        sem_wait(&max_philosopher);
+        sem_wait(&forks[left_fork]);
+        sem_wait(&forks[right_fork]);
+        sem_post(&max_philosopher);
+
+        // Eat
+        printf("Philosopher %d is eating.\n", id);
+        sleep(rand() % 3 + 1);
+
+        // Release forks
+        sem_post(&forks[left_fork]);
+        sem_post(&forks[right_fork]);
+    }
+
+    printf("Philosopher %d finished their meals and leaves the table.\n", id);
+    pthread_exit(NULL);
+}
+
+int main()
+{
+    pthread_t philosophers[NUM_PHILOSOPHERS];
+    int philosopher_id[NUM_PHILOSOPHERS];
+
+    // Initialize semaphores
+    sem_init(&max_philosopher, 0, NUM_PHILOSOPHERS - 1); // Limit the number of philosophers to prevent deadlock
+    for (int i = 0; i < NUM_PHILOSOPHERS; i++)
+    {
+        sem_init(&forks[i], 0, 1);
+    }
+
+    // Create philosopher threads
+    for (int i = 0; i < NUM_PHILOSOPHERS; i++)
+    {
+        philosopher_id[i] = i;
+        pthread_create(&philosophers[i], NULL, philosopher, &philosopher_id[i]);
+    }
+
+    // Join philosopher threads
+    for (int i = 0; i < NUM_PHILOSOPHERS; i++)
+    {
+        pthread_join(philosophers[i], NULL);
+    }
+
+    // Destroy semaphores
+    for (int i = 0; i < NUM_PHILOSOPHERS; i++)
+    {
+        sem_destroy(&forks[i]);
+    }
+    sem_destroy(&max_philosopher);
+
+    return 0;
+}
+
+
+
+// READER WRITER
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+#define READERS_COUNT 3
+#define WRITERS_COUNT 2
+
+sem_t mutex, wrt;
+int read_count = 0;
+int cs = 0;
+
+void *reader(void *arg)
+{
+    int reader_id = *((int *)arg);
+    while (1)
+    {
+        // Acquire mutex to update read_count
+        sem_wait(&mutex);
+        read_count++;
+        if (read_count == 1)
+            sem_wait(&wrt);
+        sem_post(&mutex);
+
+        // Reading
+        printf("Reader %d is reading %d.\n", reader_id, cs);
+
+        sem_wait(&mutex);
+        read_count--;
+        if (read_count == 0)
+            sem_post(&wrt);
+        sem_post(&mutex);
+
+        sleep(1);
+    }
+}
+
+void *writer(void *arg)
+{
+    int writer_id = *((int *)arg);
+    while (1)
+    {
+        sem_wait(&wrt);
+        printf("Writer %d is writing %d.\n", writer_id);
+        sem_post(&wrt);
+
+        sleep(2);
+    }
+}
+
+int main()
+{
+    pthread_t readers[READERS_COUNT], writers[WRITERS_COUNT];
+    int i, reader_id[READERS_COUNT], writer_id[WRITERS_COUNT];
+
+    // Initialize semaphores
+    sem_init(&mutex, 0, 1);
+    sem_init(&wrt, 0, 1);
+
+    // Create reader threads
+    for (i = 0; i < READERS_COUNT; i++)
+    {
+        reader_id[i] = i + 1;
+        pthread_create(&readers[i], NULL, reader, &reader_id[i]);
+    }
+
+    // Create writer threads
+    for (i = 0; i < WRITERS_COUNT; i++)
+    {
+        writer_id[i] = i + 1;
+        pthread_create(&writers[i], NULL, writer, &writer_id[i]);
+    }
+
+    // Join reader threads
+    for (i = 0; i < READERS_COUNT; i++)
+    {
+        pthread_join(readers[i], NULL);
+    }
+
+    // Join writer threads
+    for (i = 0; i < WRITERS_COUNT; i++)
+    {
+        pthread_join(writers[i], NULL);
+    }
+
+    // Destroy semaphores
+    sem_destroy(&mutex);
+    sem_destroy(&wrt);
+
+    return 0;
+}
+    
+    
+    
+    
+    
+    '
+    return 0;
+}
